@@ -26,4 +26,4 @@ def read_bin_file(fileName):
         file.close()
         
 
-read_bin_file("../bin/ks_4_0")
+read_bin_file("../bin/ks_50_1")
