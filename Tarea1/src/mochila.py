@@ -1,20 +1,21 @@
 import sys
 from functools import partial
+from tabulate import tabulate
 from recocido_simulado import recocido_algoritmo
 
 # Datos obtenidos del archivo leido
 elementos = []
 # Variables para el algoritmo
 t_inicial = 100 
-iteraciones = 100
+iteraciones = 5
 
 def read_bin_file(fileName):
     try:
         file = open(fileName, "r")
     except OSError:
         print("No se pudo leer el archivo: " + fileName)
-        print("Verifica que el nombre del archivo es correcto o existe")
-        print("e intentalo nuevamente")
+        print("Verifica que el nombre del archivo es correcto, existe")
+        print("o se encuentra en la carpeta bin/ e intentalo nuevamente")
         sys.exit()
     with file:
         lines = file.readlines()
@@ -31,18 +32,15 @@ def read_bin_file(fileName):
 def imprime_elementos(casos, indices, items):
     val_total = 0
     pes_total = 0
-    cadena = "Valor:    Peso:   \n"
-    cadena += "------------------\n"
+    elementos = []
     for i in range(casos):
         if int(indices[i]) == 1:
             temp = items[i]
-            cadena += "|" + str(temp[0]) + "    |    " + str(temp[1]) + "|\n"
+            #cadena += "|" + str(temp[0]) + "\t| " + str(temp[1]) + "   \t|\n"
+            elementos.append(temp)
             val_total += temp[0]
             pes_total += temp[1]
-    cadena += "------------------\n"
-    cadena += "Total:    Total:   \n"
-    cadena += str(val_total) + "      " + str(pes_total)
-    print(cadena)
+    print(tabulate(elementos, headers=['Valor', 'Peso'], tablefmt='orgtbl'))
 
 def solver(method, casos, capacidad):
     mochila, combinacion = method(casos, capacidad, elementos)
@@ -53,13 +51,13 @@ def solver(method, casos, capacidad):
 
 if __name__ == "__main__":
 
-    casos, capacidad = read_bin_file("../bin/ks_50_1")
+    casos, capacidad = read_bin_file("../bin/ks_10000_0")
 
     method = partial(recocido_algoritmo, t_inicial=t_inicial, iteraciones=iteraciones)
     solving_time = 0
     optimo_local, indices = [], []
 
-    print(f"casos: {casos}    Capacidad: {capacidad}")
+    print(f"Casos: {casos}\t Capacidad: {capacidad}\t Iteraciones: {iteraciones}")
 
     for i in range(iteraciones):
         optimo_local, indices = solver(method, casos, capacidad)

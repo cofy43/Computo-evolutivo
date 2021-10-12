@@ -3,7 +3,7 @@ import random
  
 ALPHA = 0.85
 
-def recocido_algoritmo(casos, capacidad, elementos, t_inicial=100, iteraciones=100):
+def recocido_algoritmo(casos, capacidad, elementos, t_inicial=100, iteraciones=10):
     primer_solucion = solucion_inicial(elementos, capacidad)
     optimo_local, solucion = simulacion(primer_solucion, elementos, capacidad, t_inicial, iteraciones)
     combinacion = [0] * casos
