@@ -41,12 +41,10 @@ def imprime_elementos(casos, indices, items):
             val_total += temp[0]
             pes_total += temp[1]
     print(tabulate(elementos, headers=['Valor', 'Peso'], tablefmt='orgtbl'))
+    print(f"\nValor total: {val_total}\t Peso total: {pes_total}\n")
 
 def solver(method, casos, capacidad):
     mochila, combinacion = method(casos, capacidad, elementos)
-    # Descomenta estas lineas para las soluciones a cada iteracion
-    #print("la mejor solucion es: ", mochila)
-    #print("la combinacion es: ", combinacion)
     return mochila, combinacion
 
 if __name__ == "__main__":
@@ -61,5 +59,8 @@ if __name__ == "__main__":
 
     for i in range(iteraciones):
         optimo_local, indices = solver(method, casos, capacidad)
+        # Descomenta estas lineas para las soluciones a cada iteracion
+        #print(f"\niteracion {i+1}")
+        #imprime_elementos(casos, indices, elementos)
     
     imprime_elementos(casos, indices, elementos)
