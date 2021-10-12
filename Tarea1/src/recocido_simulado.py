@@ -42,7 +42,6 @@ def cost_peso_actual(solucion, items):
     return costo, peso
 
 def genera_combinacion(solucion, items, capacidad):
-    """All possible moves are generated"""
     configuraciones = []
     for idx, _ in enumerate(items):
         if idx not in solucion:
@@ -58,7 +57,7 @@ def genera_combinacion(solucion, items, capacidad):
     return configuraciones
 
 def simulacion(solucion, items, capacidad, t_inicial, iteraciones):
-    """La fonction qui va simuler le recuit"""
+    """Ejecucion iterativa del algoritmo"""
     temperatura = t_inicial
 
     optimo_local = solucion
