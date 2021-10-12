@@ -1,29 +1,86 @@
-import sys
+import math
+import random
+ 
+ALPHA = 0.85
 
-casos = 0
-capacidad = 0
-elementos = []
+def recocido_algoritmo(casos, capacidad, elementos, t_inicial=100, iteraciones=100):
+    primer_solucion = solucion_inicial(elementos, capacidad)
+    optimo_local, solucion = simulacion(primer_solucion, elementos, capacidad, t_inicial, iteraciones)
+    combinacion = [0] * casos
+    for idx in solucion:
+        combinacion[idx] = 1
+    return optimo_local, combinacion
 
-def read_bin_file(fileName):
-    try:
-        file = open(fileName, "r")
-    except OSError:
-        print("No se pudo leer el archivo: " + fileName)
-        print("Verifica que el nombre del archivo es correcto o existe")
-        print("e intentalo nuevamente")
-        sys.exit()
-    with file:
-        lines = file.readlines()
-        parametros = lines.pop(0).replace("\n", "").split(" ")
-        casos = parametros[0]
-        capacidad = parametros[1]
-        for line in lines:
-            elementos.append(line.replace("\n", "").split(" "))
-            
-        print("casos: ", casos)
-        print("capacidad: ", capacidad)
-        print("elementos: ", elementos)
-        file.close()
-        
+def solucion_inicial(items, capacidad):
+    """
+    Tomamos de manera aleatoria elementos mientras no
+    exedamos la capacidad maxima de la mochila
+    """
+    solucion = []
+    total_items = len(items)
+    indices = [x for x in range(total_items)]
+    while capacidad > 0:
+        indice = random.randint(0, len(indices) - 1)
+        item_seleccionado = indices.pop(indice)
+        if cost_peso_actual(solucion + [item_seleccionado], items)[0] <= capacidad:
+            solucion.append(item_seleccionado)
+            capacidad -= items[item_seleccionado][0]
+        else:
+            break
+    return solucion
 
-read_bin_file("../bin/ks_50_1")
+def cost_peso_actual(solucion, items):
+    """
+    calcula el tamaño y peso dada una combinacion
+    de elementos para poder saber si se agregan o no
+    mas elementos a la solucion local
+    """
+    costo, peso = 0, 0
+    for item in solucion:
+        peso += items[item][1]
+        costo += items[item][0]
+    return costo, peso
+
+def genera_combinacion(solucion, items, capacidad):
+    """All possible moves are generated"""
+    configuraciones = []
+    for idx, _ in enumerate(items):
+        if idx not in solucion:
+            configuracion = solucion[:]
+            configuracion.append(idx)
+            if cost_peso_actual(configuracion, items)[1] <= capacidad:
+                configuraciones.append(configuracion)
+    for idx, _ in enumerate(solucion):
+        configuracion = solucion[:]
+        del configuracion[idx]
+        if configuracion not in configuraciones:
+            configuraciones.append(configuracion)
+    return configuraciones
+
+def simulacion(solucion, items, capacidad, t_inicial, iteraciones):
+    """La fonction qui va simuler le recuit"""
+    temperatura = t_inicial
+
+    optimo_local = solucion
+    costo_local = cost_peso_actual(solucion, items)[0]
+
+    optimo_actual = solucion
+    while True:
+        costo_actual = cost_peso_actual(optimo_local, items)[0]
+        for i in range(0, iteraciones):
+            configuraciones = genera_combinacion(optimo_actual, items, capacidad)
+            idx = random.randint(0, len(configuraciones) - 1)
+            config_aleatoria = configuraciones[idx]
+            delta = cost_peso_actual(config_aleatoria, items)[0] - costo_local
+            if delta > 0:
+                optimo_local = config_aleatoria
+                costo_local = cost_peso_actual(optimo_local, items)[0]
+                optimo_actual = config_aleatoria
+            else:
+                if math.exp(delta / float(temperatura)) > random.random():
+                    optimo_actual = config_aleatoria
+
+        temperatura *= ALPHA
+        if costo_actual >= costo_local or temperatura <= 0:
+            break
+    return costo_local, optimo_local
