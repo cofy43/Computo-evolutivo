@@ -1,6 +1,5 @@
 import sys
 from functools import partial
-from time import time
 from recocido_simulado import recocido_algoritmo
 
 # Datos obtenidos del archivo leido
@@ -47,20 +46,22 @@ def imprime_elementos(casos, indices, items):
 
 def solver(method, casos, capacidad):
     mochila, combinacion = method(casos, capacidad, elementos)
+    # Descomenta estas lineas para las soluciones a cada iteracion
     #print("la mejor solucion es: ", mochila)
     #print("la combinacion es: ", combinacion)
     return mochila, combinacion
 
 if __name__ == "__main__":
+
     casos, capacidad = read_bin_file("../bin/ks_50_1")
+
     method = partial(recocido_algoritmo, t_inicial=t_inicial, iteraciones=iteraciones)
     solving_time = 0
     optimo_local, indices = [], []
+
     print(f"casos: {casos}    Capacidad: {capacidad}")
+
     for i in range(iteraciones):
-        t_start = time()
         optimo_local, indices = solver(method, casos, capacidad)
-        t_finish = time()
-        solving_time += (t_finish - t_start)
+    
     imprime_elementos(casos, indices, elementos)
-    print ("Average solving time: %s sec." % (solving_time / iteraciones))
