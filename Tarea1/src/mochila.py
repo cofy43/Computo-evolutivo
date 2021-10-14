@@ -48,8 +48,10 @@ def solver(method, casos, capacidad):
     return mochila, combinacion
 
 if __name__ == "__main__":
-
-    casos, capacidad = read_bin_file("../bin/ks_10000_0")
+    # Descomentar el caso a ejecutar
+    casos, capacidad = read_bin_file("../bin/ks_4_0")
+    # casos, capacidad = read_bin_file("../bin/ks_50_1")
+    # casos, capacidad = read_bin_file("../bin/ks_10000_0")
 
     method = partial(recocido_algoritmo, t_inicial=t_inicial, iteraciones=iteraciones)
     solving_time = 0
