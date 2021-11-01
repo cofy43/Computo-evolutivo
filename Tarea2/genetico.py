@@ -4,7 +4,9 @@ import numpy as np
 def evalua(f, genotipo):
     aptitud = []
     for individuo in genotipo:
-        aptitud.append(f(individuo))
+        apt = f(individuo)
+        print("apt", apt)
+        aptitud.append(apt)
     return aptitud
 
 def fa(indivuduo):
@@ -13,30 +15,46 @@ def fa(indivuduo):
 
 def inicializar(f, npop, nvars):
     # Generar población inicial
-    # La razon por la que npop se multiplica por dos es que al ser f una funcion de
-    # aptitud de dos variables entonces necesitamos que cada individuo este conformado
-    # por dos variables y por tanto necesitamos un arreglo de dos veces el tamaño de la
-    # poblacion
-    genotipos = lb + (ub - lb) * np.random.uniform(low=-500, high=500, size=[npop*2, nvars])
-    #print(genotipos)
+    print("lb")
+    print(lb)
+    print("ub")
+    print(ub)
+    genotipos = lb + (ub - lb) * np.random.uniform(low=0.0, high=1.0, size=[npop, nvars])
+    print("genotipos")
+    print(genotipos)
+    print("-----------------------")
     # Fenotipos
     fenotipos = genotipos
     # Evaluar población
     aptitudes = evalua(f, fenotipos)
+    print("aptitudes")
     print(aptitudes)
+    print("-----------------------")
     return genotipos,fenotipos,aptitudes
 
-#def ruleta()
+def seleccion_ruleta(aptitudes, n):
+    p = aptitudes/sum(aptitudes)
+    cp = np.cumsum(p)
+    parents = np.zeros(n)
+    for i in range(n):
+        X = np.random.uniform()
+        parents[i] = np.argwhere(cp > X)[0]
+    return parents.astype(int)
+
 
 def EA(f, lb, ub, pc, pm, nvars, npop, ngen):
     genotipos, fenotipos, aptitudes = inicializar(f, npop, nvars)
+    # Hasta condición de paro
+    indx = seleccion_ruleta(aptitudes, npop)
+    print("indices")
+    print(indx)
 
 nvars= 2
-lb = 0*np.ones(nvars)
-ub = 100*np.ones(nvars)
+lb = -500*np.ones(nvars)
+ub = 500*np.ones(nvars)
 pc = 0.9    
 pm = 0.01
-npop = 200
+npop = 10
 ngen = 500
 
 np.set_printoptions(formatter={'float': '{0: 0.3f}'.format})
