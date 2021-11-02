@@ -1,5 +1,6 @@
-from typing import cast
+from typing import Protocol, cast
 import numpy as np
+from numpy.core.arrayprint import printoptions
 
 # Funcion intermedia para evaluar la apitud de cada fila
 def evalua(f, genotipo):
@@ -51,7 +52,7 @@ def float_bin(number):
   
     return res
 
-def mutacion(genotipo, indx, pm):
+def mutacion(genotipo, indx, pm, ejecucionMinima):
     hijos = []
     #Seleccionamos los mejores individuos
     for i in indx:
@@ -59,6 +60,9 @@ def mutacion(genotipo, indx, pm):
         binario = [float_bin(individuo[0])]
         binario.append(float_bin(individuo[1]))
         mutado = inversion_de_un_bit(binario, pm)
+        if ejecucionMinima:
+            print("Individuo original:\n", individuo)
+            print("Individuo mutado:\n", mutado)
         hijos.append(mutado)
     return np.array(hijos)
 
@@ -103,13 +107,15 @@ def estadisticas(generacion, genotipos, fenotipos, aptitudes, hijos_genotipo, hi
     print('Desempeño fuera de línea para t=1: ', np.max(aptitudes))
     print('Mejor individuo en la generación: ', np.argmax(aptitudes))
 
-def cruza_un_punto(genotipo, idx, pc):
+def cruza_un_punto(genotipo, idx, pc, ejecucionMinima):
     hijos_genotipo = np.zeros(np.shape(genotipo))
     k = 0
     for i, j in zip(idx[::2], idx[1::2]):
         flip = np.random.uniform()<=pc
         if flip:
             punto_cruza = np.random.randint(0, len(genotipo[0]))
+            if ejecucionMinima:
+                print("Punto de cruza:\n",punto_cruza)
             hijos_genotipo[k] = np.concatenate((genotipo[i,0:punto_cruza], genotipo[j,punto_cruza:]))
             hijos_genotipo[k+1] = np.concatenate((genotipo[j, 0:punto_cruza], genotipo[i, punto_cruza:]))
         else:
@@ -152,21 +158,37 @@ def jerarquia_no_lineal(genotipos, aptitudes, q, np):
         i += 1
     return nuevas_aptitudes
 
-def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q):
+def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
     genotipos, fenotipos, aptitudes = inicializar(f, npop, nvars) #completa
+
+    if ejecucionMinima:
+        print("inicializacion")
+        print("Poblacion 0:")
+        print("fenotipos:\n", fenotipos)
+        print("genotipos:\n", genotipos)
+        print("aptitudes:\n", fenotipos)
     ba = np.zeros((ngen, 1)) 
     # Hasta condición de paro
     for i in range(ngen):
+        if ejecucionMinima:
+            print("Poblacion ", i)
         # Escalamiento
         #nuevas_aptitudes = jerarquia_no_lineal(genotipos, aptitudes, q, npop)
         # Selección de padres
         indx = seleccion_ruleta(aptitudes, npop) #completo
+        if ejecucionMinima:
+            print("Padres seleccionados:\n", indx)
         # Cruza
-        hijos_genotipo = cruza_un_punto(genotipos, indx, pc) #completo
+        hijos_genotipo = cruza_un_punto(genotipos, indx, pc, ejecucionMinima) #completo
         # Mutacion
-        hijos_genotipo = mutacion(genotipos, indx, pm) #completo
+        hijos_genotipo = mutacion(genotipos, indx, pm, ejecucionMinima) #completo
         hijos_fenotipo = hijos_genotipo
         hijos_aptitudes= evalua(f, hijos_fenotipo) #completo
+        if ejecucionMinima:
+            print("Nueva poblacion:")
+            print("Nuevo fenotipo:\n", hijos_fenotipo)
+            print("Nuevo genotipo:\n", hijos_genotipo)
+            print("Nuevas aptitudes:\n", hijos_aptitudes)
 
         # Estadisticas
         estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
@@ -180,12 +202,32 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q):
 
         #Selección de siguiente generación
         genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
+        if ejecucionMinima:
+            print("Posterior a la seleccion mas:")
+            print("Nuevo fenotipo:\n", genotipos)
+            print("Nuevo genotipo:\n", genotipos)
+            print("Nuevas aptitudes:\n", aptitudes)
     print('Tabla de mejores:\n', ba)
     idx = np.argmax(aptitudes)
     print("mejor individuo genotipo:\n", genotipos[idx])
     print("mejor individuo fenotipo:\n", fenotipos[idx])
     print("mejor individuo aptitud:\n", aptitudes[idx])
     return genotipos[idx], fenotipos[idx], aptitudes[idx]
+
+
+"""
+Ejecucion con parametros minimos
+"""
+nvars= 2
+lb = -500*np.ones(nvars)
+ub = 500*np.ones(nvars)
+pc = 0.9    
+pm = 0.5
+npop = 6
+ngen = 2
+q = 0.5
+ejecucionMinima = True
+print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima))
 
 nvars= 2
 lb = -500*np.ones(nvars)
@@ -197,4 +239,4 @@ ngen = 100
 q = 0.5
 
 np.set_printoptions(formatter={'float': '{0: 0.6f}'.format})
-print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q))
+print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima))
