@@ -189,9 +189,9 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
             print("Nuevo fenotipo:\n", hijos_fenotipo)
             print("Nuevo genotipo:\n", hijos_genotipo)
             print("Nuevas aptitudes:\n", hijos_aptitudes)
-
-        # Estadisticas
-        estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
+        else:
+            # Estadisticas
+            estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
 
         #Mejor individuo
         idx_best = np.argmax(aptitudes)
@@ -217,7 +217,7 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
 
 """
 Ejecucion con parametros minimos
-"""
+descomentar las siguientes lineas
 nvars= 2
 lb = -500*np.ones(nvars)
 ub = 500*np.ones(nvars)
@@ -228,6 +228,7 @@ ngen = 2
 q = 0.5
 ejecucionMinima = True
 print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima))
+"""
 
 nvars= 2
 lb = -500*np.ones(nvars)
@@ -237,6 +238,7 @@ pm = 0.5
 npop = 10
 ngen = 100
 q = 0.5
+ejecucionMinima = False
 
 np.set_printoptions(formatter={'float': '{0: 0.6f}'.format})
 print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima))
