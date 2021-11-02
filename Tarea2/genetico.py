@@ -1,3 +1,4 @@
+from typing import cast
 import numpy as np
 
 # Funcion intermedia para evaluar la apitud de cada fila
@@ -30,12 +31,66 @@ def seleccion_ruleta(aptitudes, n):
         parents[i] = np.argwhere(cp > X)[0]
     return parents.astype(int)
 
-def inversion_de_un_bit(genotipo, indx):
+def float_bin(number):
+    whole, dec = str(number).split(".")
+    # esto es por los numeros que incluyen
+    # notacion cientifica, en cuyo caso sucede
+    # una excepcion si se intenta convertir la parte
+    # decimal a binario 
+    try:
+        notacion_cientifica = str(dec).index("e")
+        if notacion_cientifica > 0:
+            dec = str(dec)[0:str(dec).index("e")]
+    except ValueError:
+        dec = dec
+    whole = int(whole)
+    dec = int (dec)
+
+  
+    res = str(bin(whole)) + "." + str(bin(dec))
+  
+    return res
+
+def mutacion(genotipo, indx, pm):
     hijos = []
+    #Seleccionamos los mejores individuos
     for i in indx:
-        hijos.append(genotipo[i])
-        # Falta implementar inversion de un bit
+        individuo = genotipo[i]
+        binario = [float_bin(individuo[0])]
+        binario.append(float_bin(individuo[1]))
+        mutado = inversion_de_un_bit(binario, pm)
+        hijos.append(mutado)
     return np.array(hijos)
+
+def inversion_de_un_bit(individuo_binario, pm):
+    primera_parte = list(individuo_binario[0])
+    segunda_parte = list(individuo_binario[1])
+    for i in range(len(primera_parte)):
+        flip = np.random.uniform() <= pm
+        digit = primera_parte[i]
+        if flip and digit.isdigit():
+            res = (int(digit) + 1) % 2
+            primera_parte[i] = str(res)
+
+    for i in range(len(segunda_parte)):
+        flip = np.random.uniform() <= pm
+        digit = segunda_parte[i]
+        if flip and digit.isdigit():
+            res = (int(digit) + 1) % 2
+            segunda_parte[i] = str(res)
+
+    nuevo_binario_1 = ''.join([str(elem) for elem in primera_parte])
+    nuevo_binario_2 = ''.join([str(elem) for elem in segunda_parte])
+    mutado = [nuevo_binario_1 , nuevo_binario_2]
+    mutado = [binaryToFloat(nuevo_binario_1) , binaryToFloat(nuevo_binario_2)]
+    #Regresamos a su representacion real
+    return mutado
+
+def binaryToFloat(binary):
+    whole, dec = str(binary).replace("b", "").split(".")
+    whole = int(whole, 2)
+    dec = int(dec, 2)
+    return float(str(whole) + "." + str(dec))
 
 def estadisticas(generacion, genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes, padres):
     print('---------------------------------------------------------')
@@ -48,7 +103,7 @@ def estadisticas(generacion, genotipos, fenotipos, aptitudes, hijos_genotipo, hi
     print('Desempeño fuera de línea para t=1: ', np.max(aptitudes))
     print('Mejor individuo en la generación: ', np.argmax(aptitudes))
 
-def mutacion_un_punto(genotipo, idx, pc):
+def cruza_un_punto(genotipo, idx, pc):
     hijos_genotipo = np.zeros(np.shape(genotipo))
     k = 0
     for i, j in zip(idx[::2], idx[1::2]):
@@ -64,18 +119,22 @@ def mutacion_un_punto(genotipo, idx, pc):
     return hijos_genotipo
 
 def seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes):
-    """
     mitad = int(len(fenotipos)/2)
     indices_mejores_padres = np.argpartition(aptitudes, -mitad)[-mitad:]
     indices_mejores_hijos = np.argpartition(hijos_aptitudes, -mitad)[-mitad:]
-    print("fenotipos[indices_mejores_padres]", fenotipos[indices_mejores_padres])
-    print("hijos_fenotipo[0][indices_mejores_hijos]", hijos_fenotipo[indices_mejores_hijos])
-    nuevo_fenotipo = fenotipos[indices_mejores_padres] + hijos_fenotipo[indices_mejores_hijos]
+    # nuevo_fenotipo = fenotipos[indices_mejores_padres] + hijos_fenotipo[indices_mejores_hijos]
+    nuevo_fenotipo = []
+    nuevo_aptitudes = []
+    for i in indices_mejores_padres:
+        nuevo_aptitudes.append(aptitudes[i])
+        nuevo_fenotipo.append(fenotipos[i])
+
+    for i in indices_mejores_hijos:
+        nuevo_aptitudes.append(hijos_aptitudes[i])
+        nuevo_fenotipo.append(hijos_fenotipo[i])
     nuevo_genotipo = nuevo_fenotipo
-    nuevo_aptitudes = aptitudes[indices_mejores_padres] + hijos_aptitudes[indices_mejores_hijos]
-    return nuevo_fenotipo, nuevo_genotipo, nuevo_aptitudes
-    """
-    return hijos_genotipo, hijos_fenotipo, hijos_aptitudes
+    return np.array(nuevo_fenotipo), np.array(nuevo_genotipo), np.array(nuevo_aptitudes)
+    # return hijos_genotipo, hijos_fenotipo, hijos_aptitudes
 
 def EA(f, lb, ub, pc, pm, nvars, npop, ngen):
     genotipos, fenotipos, aptitudes = inicializar(f, npop, nvars) #completa
@@ -84,12 +143,13 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen):
     for i in range(ngen):
         # Selección de padres
         indx = seleccion_ruleta(aptitudes, npop) #completo
+        # Escalaiento
         # Cruza
-        hijos_genotipo = inversion_de_un_bit(genotipos, indx)
+        hijos_genotipo = cruza_un_punto(genotipos, indx, pc) #completo
         # Mutacion
-        #hijos_genotipo = mutacion_un_punto(genotipos, indx, pc) #completo
+        hijos_genotipo = mutacion(genotipos, indx, pm) #completo
         hijos_fenotipo = hijos_genotipo
-        hijos_aptitudes= evalua(f, hijos_fenotipo)
+        hijos_aptitudes= evalua(f, hijos_fenotipo) #completo
 
         # Estadisticas
         #estadisticas(i, genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes, indx)
@@ -103,8 +163,6 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen):
 
         #Selección de siguiente generación
         genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
-        print("nuevos")
-        print(genotipos, fenotipos, aptitudes)
     print('Tabla de mejores:\n', ba)
     idx = np.argmax(aptitudes)
     return genotipos[idx], fenotipos[idx], aptitudes[idx]
@@ -113,9 +171,9 @@ nvars= 2
 lb = -500*np.ones(nvars)
 ub = 500*np.ones(nvars)
 pc = 0.9    
-pm = 0.01
+pm = 0.5
 npop = 10
-ngen = 500
+ngen = 100
 
 np.set_printoptions(formatter={'float': '{0: 0.6f}'.format})
 print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen))
