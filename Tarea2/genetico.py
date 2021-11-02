@@ -136,14 +136,31 @@ def seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotip
     return np.array(nuevo_fenotipo), np.array(nuevo_genotipo), np.array(nuevo_aptitudes)
     # return hijos_genotipo, hijos_fenotipo, hijos_aptitudes
 
-def EA(f, lb, ub, pc, pm, nvars, npop, ngen):
+def normalizacion(q, n):
+    return 1/(1-pow((1-q), n))
+
+def get_jerarquias(aptitudes):
+    return aptitudes
+
+def jerarquia_no_lineal(genotipos, aptitudes, q, np):
+    nuevas_aptitudes = []
+    jerarquias = get_jerarquias(aptitudes)
+    c = normalizacion(q,np)
+    i = 0
+    for _ in aptitudes:
+        nuevas_aptitudes.append(c*q*pow((1-q), jerarquias[i]-1))
+        i += 1
+    return nuevas_aptitudes
+
+def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q):
     genotipos, fenotipos, aptitudes = inicializar(f, npop, nvars) #completa
     ba = np.zeros((ngen, 1)) 
     # Hasta condición de paro
     for i in range(ngen):
+        # Escalamiento
+        #nuevas_aptitudes = jerarquia_no_lineal(genotipos, aptitudes, q, npop)
         # Selección de padres
         indx = seleccion_ruleta(aptitudes, npop) #completo
-        # Escalaiento
         # Cruza
         hijos_genotipo = cruza_un_punto(genotipos, indx, pc) #completo
         # Mutacion
@@ -152,7 +169,7 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen):
         hijos_aptitudes= evalua(f, hijos_fenotipo) #completo
 
         # Estadisticas
-        #estadisticas(i, genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes, indx)
+        estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
 
         #Mejor individuo
         idx_best = np.argmax(aptitudes)
@@ -174,6 +191,7 @@ pc = 0.9
 pm = 0.5
 npop = 10
 ngen = 100
+q = 0.5
 
 np.set_printoptions(formatter={'float': '{0: 0.6f}'.format})
-print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen))
+print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q))
