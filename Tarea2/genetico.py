@@ -1,6 +1,5 @@
-from typing import Protocol, cast
 import numpy as np
-from numpy.core.arrayprint import printoptions
+import os
 
 # Funcion intermedia para evaluar la apitud de cada fila
 def evalua(f, genotipo):
@@ -158,9 +157,15 @@ def jerarquia_no_lineal(genotipos, aptitudes, q, np):
         i += 1
     return nuevas_aptitudes
 
-def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
+def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, numero_iteracion):
     genotipos, fenotipos, aptitudes = inicializar(f, npop, nvars) #completa
-
+    minma = np.copy(genotipos[np.argmin(aptitudes)])
+    media = np.median(aptitudes)
+    maximo = np.copy(genotipos[np.argmax(aptitudes)])
+    desviacion = np.std(aptitudes)
+    nombre_archivo = ""
+    if guardar_resultados:
+        nombre_archivo = "Resultados/Ejecucion{indice}.txt".format(indice=numero_iteracion+1)
     if ejecucionMinima:
         print("inicializacion")
         print("Poblacion 0:")
@@ -191,7 +196,7 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
             print("Nuevas aptitudes:\n", hijos_aptitudes)
         else:
             # Estadisticas
-            estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
+                estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
 
         #Mejor individuo
         idx_best = np.argmax(aptitudes)
@@ -199,7 +204,6 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
         b_fen = np.copy(fenotipos[idx_best])
         b_apt = np.copy(aptitudes[idx_best])
         ba[i] = np.copy(aptitudes[idx_best])
-
         #Selección de siguiente generación
         genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
         if ejecucionMinima:
@@ -207,11 +211,23 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima):
             print("Nuevo fenotipo:\n", genotipos)
             print("Nuevo genotipo:\n", genotipos)
             print("Nuevas aptitudes:\n", aptitudes)
+        if guardar_resultados:
+            minma = aptitudes[np.argmin(aptitudes)]
+            maximo = aptitudes[idx_best]
+            media = np.median(aptitudes)
+            desviacion = np.std(aptitudes)
     print('Tabla de mejores:\n', ba)
     idx = np.argmax(aptitudes)
     print("mejor individuo genotipo:\n", genotipos[idx])
     print("mejor individuo fenotipo:\n", fenotipos[idx])
     print("mejor individuo aptitud:\n", aptitudes[idx])
+    if guardar_resultados:
+        f = open(nombre_archivo, 'w')
+        f.write("Mínima={min}\n".format(min=minma))
+        f.write("Media={med}\n".format(med=media))
+        f.write("Máxima={max}\n".format(max=maximo))
+        f.write("Desviación Estándar={de}\n".format(de=desviacion))
+        f.close()
     return genotipos[idx], fenotipos[idx], aptitudes[idx]
 
 
@@ -227,8 +243,32 @@ npop = 6
 ngen = 2
 q = 0.5
 ejecucionMinima = True
-print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima))
+guardar_resultados = False
+print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, 0))
 """
+"""
+Resultados promediados de 20 ejecuciones
+descomentar las siguientes lineas
+
+nvars= 2
+lb = -500*np.ones(nvars)
+ub = 500*np.ones(nvars)
+pc = 0.9    
+pm = 0.5
+npop = 6
+ngen = 2
+q = 0.5
+ejecucionMinima = False
+guardar_resultados = True
+try:
+    os.mkdir('Resultados')
+except FileExistsError as e:
+    print("Ya existe el directorio Resultados, así que se sobreescibiran los resultados de los archivos")
+
+for i in range(20):
+    genotipos, fenotipos, aptitudes = EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, i)
+"""
+
 
 nvars= 2
 lb = -500*np.ones(nvars)
@@ -239,6 +279,6 @@ npop = 10
 ngen = 100
 q = 0.5
 ejecucionMinima = False
-
+guardar_resultados = False
 np.set_printoptions(formatter={'float': '{0: 0.6f}'.format})
-print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima))
+print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, 0))
