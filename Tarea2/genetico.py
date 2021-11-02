@@ -1,5 +1,9 @@
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
 import os
+
+nombre_generico = "Resultados/Ejecucion{indice}.txt"
 
 # Funcion intermedia para evaluar la apitud de cada fila
 def evalua(f, genotipo):
@@ -165,7 +169,7 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resulta
     desviacion = np.std(aptitudes)
     nombre_archivo = ""
     if guardar_resultados:
-        nombre_archivo = "Resultados/Ejecucion{indice}.txt".format(indice=numero_iteracion+1)
+        nombre_archivo = nombre_generico.format(indice=numero_iteracion+1)
     if ejecucionMinima:
         print("inicializacion")
         print("Poblacion 0:")
@@ -223,17 +227,48 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resulta
     print("mejor individuo aptitud:\n", aptitudes[idx])
     if guardar_resultados:
         f = open(nombre_archivo, 'w')
-        f.write("Mínima={min}\n".format(min=minma))
+        f.write("Minima={min}\n".format(min=minma))
         f.write("Media={med}\n".format(med=media))
-        f.write("Máxima={max}\n".format(max=maximo))
-        f.write("Desviación Estándar={de}\n".format(de=desviacion))
+        f.write("Maxima={max}\n".format(max=maximo))
+        f.write("Desviación Estandar={de}\n".format(de=desviacion))
         f.close()
     return genotipos[idx], fenotipos[idx], aptitudes[idx]
 
+def genera_grafica():
+    # Se optienen los datos de los archivos guardados previamente
+    generaciones = []
+    medianas = []
+    for i in range(20):
+        nombre = nombre_generico.format(indice=i+1)
+        try:
+            f = open(nombre, 'rb')
+        except OSError:
+            print("Ocurrio un error al leer el archivo:", nombre)
+            print("Por tanto se omitiran los datos de dicho archivo en la grafica")
+        with f:
+            mediana = str(f.readlines()[1]).split("=")[1]
+            # quitamos salto de linea
+            mediana = mediana[0:len(mediana)-3]
+            # convertimos a flotante
+            mediana = float(mediana)
+            generaciones.append(i+1)
+            medianas.append(mediana)
 
+    #construccion de la grafica
+    _, ax = plt.subplots()
+    #Colocamos una etiqueta en el eje Y
+    ax.set_ylabel('Medianas')
+    #Colocamos una etiqueta en el eje X
+    ax.set_xlabel('Generaciones')
+    #Colocamos una titulo
+    ax.set_title('Grafica de las iteraciones')
+    #Creamos la grafica de barras utilizando 'paises' como eje X y 'ventas' como eje y.
+    plt.bar(generaciones, medianas)
+    plt.savefig('grafica.png')
+
+# Ejecucion con parametros minimos
+# descomentar las siguientes lineas
 """
-Ejecucion con parametros minimos
-descomentar las siguientes lineas
 nvars= 2
 lb = -500*np.ones(nvars)
 ub = 500*np.ones(nvars)
@@ -246,9 +281,9 @@ ejecucionMinima = True
 guardar_resultados = False
 print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, 0))
 """
-"""
-Resultados promediados de 20 ejecuciones
-descomentar las siguientes lineas
+
+# Resultados promediados de 20 ejecuciones
+# descomentar las siguientes lineas
 
 nvars= 2
 lb = -500*np.ones(nvars)
@@ -267,9 +302,14 @@ except FileExistsError as e:
 
 for i in range(20):
     genotipos, fenotipos, aptitudes = EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, i)
+# Si se quiere generar la grafica actualizada con los resultados de las ejecuciones
+# descomentar la siguiente linea
+# genera_grafica()
+
+
+# Ejecucion normal
+# decomentar las siguientes lineas
 """
-
-
 nvars= 2
 lb = -500*np.ones(nvars)
 ub = 500*np.ones(nvars)
@@ -282,3 +322,4 @@ ejecucionMinima = False
 guardar_resultados = False
 np.set_printoptions(formatter={'float': '{0: 0.6f}'.format})
 print(EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, 0))
+"""
