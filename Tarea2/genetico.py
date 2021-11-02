@@ -236,6 +236,8 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resulta
 
 def genera_grafica():
     # Se optienen los datos de los archivos guardados previamente
+    minimo = 10000000
+    total = 0
     generaciones = []
     medianas = []
     for i in range(20):
@@ -251,8 +253,13 @@ def genera_grafica():
             mediana = mediana[0:len(mediana)-3]
             # convertimos a flotante
             mediana = float(mediana)
+            if minimo > mediana:
+                minimo = mediana
+            total += mediana
             generaciones.append(i+1)
             medianas.append(mediana)
+    print("minimo:", minimo)
+    print("promedio:", total/len(medianas))
 
     #construccion de la grafica
     _, ax = plt.subplots()
@@ -261,9 +268,10 @@ def genera_grafica():
     #Colocamos una etiqueta en el eje X
     ax.set_xlabel('Generaciones')
     #Colocamos una titulo
-    ax.set_title('Grafica de las iteraciones')
+    ax.set_title('Grafica de convergencia')
     #Creamos la grafica de barras utilizando 'paises' como eje X y 'ventas' como eje y.
-    plt.bar(generaciones, medianas)
+    # plt.subplot(len(medianas))
+    plt.plot(generaciones, medianas, color = "c")
     plt.savefig('grafica.png')
 
 # Ejecucion con parametros minimos
@@ -304,7 +312,7 @@ for i in range(20):
     genotipos, fenotipos, aptitudes = EA(fa, lb, ub, pc, pm, nvars, npop, ngen, q, ejecucionMinima, guardar_resultados, i)
 # Si se quiere generar la grafica actualizada con los resultados de las ejecuciones
 # descomentar la siguiente linea
-# genera_grafica()
+genera_grafica()
 
 
 # Ejecucion normal
