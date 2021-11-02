@@ -182,6 +182,9 @@ def EA(f, lb, ub, pc, pm, nvars, npop, ngen, q):
         genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
     print('Tabla de mejores:\n', ba)
     idx = np.argmax(aptitudes)
+    print("mejor individuo genotipo:\n", genotipos[idx])
+    print("mejor individuo fenotipo:\n", fenotipos[idx])
+    print("mejor individuo aptitud:\n", aptitudes[idx])
     return genotipos[idx], fenotipos[idx], aptitudes[idx]
 
 nvars= 2
