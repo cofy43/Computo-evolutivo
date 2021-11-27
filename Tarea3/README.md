@@ -1,6 +1,13 @@
 ## Tarea 3
 Desarrollar un algoritmo evolutivo en Python con las siguientes características:
  * Seleccionar los componentes básicos del evolutivo
+    Representación: Punto flotante Real
+    Escalamiento: Escalamiento Sigma
+    Selección de padres: Muestreo determinístico
+    Cruza: Intermedia
+    Mutación: De límite
+    Selección: Más
+    Elitismo: 
  * Seleccionar al menos dos técnicas avanzadas
     * Paralelismo
     * Coevolución
