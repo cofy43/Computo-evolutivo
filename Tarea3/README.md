@@ -5,7 +5,7 @@ Desarrollar un algoritmo evolutivo en Python con las siguientes características
     Escalamiento: Escalamiento Sigma
     Selección de padres: Muestreo determinístico
     Cruza: Intermedia
-    Mutación: De límite
+    Mutación: uniforme
     Selección: Más
     Elitismo: 
  * Seleccionar al menos dos técnicas avanzadas
