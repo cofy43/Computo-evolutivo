@@ -160,7 +160,7 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
     bf = np.zeros((ngen, nvars))
     ba = np.zeros((ngen, 1))
     genotipos, fenotipos, aptitudes = inicializa(f, npop, nvars, lb, ub)
-    nombre_archivo_t = nombre_generico_total.format(name="Easom")
+    #nombre_archivo_t = nombre_generico_total.format(name="Easom")
     for i in range(ngen):
         # Seleccion de padres
         indx = seleccion_padres(aptitudes, npop/2)
@@ -214,19 +214,27 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
     return genotipos[idx], fenotipos[idx], aptitudes[idx]
 
 nvars = 10
-lb = 0*np.ones(nvars)
-ub = 100*np.ones(nvars)
-pc = 0.9
-pm = 0.01
-npop = 200
+lb = -6*np.ones(nvars)
+ub = 6*np.ones(nvars)
+pc = 0.5
+pm = 0.1
+npop = 600
 ngen = 20
 # rastrigin
 #print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
 # ackley
+#lb = -33*np.ones(nvars)
+#ub = 33*np.ones(nvars)
 #print(algoritmo_evolutivo(parallelAckley, lb, ub, pc, pm, nvars, npop, ngen))
 # rosenbrock
+#lb = -5*np.ones(nvars)
+#ub = 10*np.ones(nvars)
 #print(algoritmo_evolutivo(parallelRosenbrock, lb, ub, pc, pm, nvars, npop, ngen))
 # eggholder
+#lb = -512*np.ones(nvars)
+#ub = 512*np.ones(nvars)
 #print(algoritmo_evolutivo(parallelEggholder, lb, ub, pc, pm, nvars, npop, ngen))
 # easom
-#print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, nvars, npop, ngen))
+lb = -100*np.ones(nvars)
+ub = 100*np.ones(nvars)
+print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, nvars, npop, ngen))

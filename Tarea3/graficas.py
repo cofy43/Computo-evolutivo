@@ -68,10 +68,18 @@ def genera_reporte_latex(archivo):
         print("\t Promedio &{min} &{med} &{max} &{des} \\\\".format(min=sum(minimas)/len(minimas), med=sum(medianas)/len(medianas), max=sum(maxima)/len(maxima), des=sum(desviasciones)/len(desviasciones) ))
         print("\t\\hline")
         print("\\end{tabular}")
-"""
+
 genera_grafica_convergencia("Resultados/Ackley/Resultados_problema_Ackley_total.txt", "Ackley")
+genera_reporte_latex("Resultados/Ackley/Resultados_problema_Ackley_total.txt")
+print()
+print()
 genera_grafica_convergencia("Resultados/Eggholder/Resultados_problema_Eggholder_total.txt", "Eggholder")
+genera_reporte_latex("Resultados/Eggholder/Resultados_problema_Eggholder_total.txt")
+print()
+print()
 genera_grafica_convergencia("Resultados/Rastrigin/Resultados_problema_Rastrigin_total.txt", "Rastrigin")
+genera_reporte_latex("Resultados/Rastrigin/Resultados_problema_Rastrigin_total.txt")
+print()
+print()
 genera_grafica_convergencia("Resultados/Rosenbrock/Resultados_problema_Rosenbrock_total.txt", "Rosenbrock")
-"""
 genera_reporte_latex("Resultados/Rosenbrock/Resultados_problema_Rosenbrock_total.txt")
