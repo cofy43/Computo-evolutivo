@@ -8,7 +8,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy import stats
 np.random.seed(42)
-nsamp = 10000
 
 nvars= 2
 lb = -500*np.ones(nvars)
@@ -16,7 +15,7 @@ ub = 500*np.ones(nvars)
 pc = 0.9    
 pm = 0.5
 npop = 10
-ngen = 100
+ngen = 10000
 q = 0.5
 ejecucionMinima = False
 guardar_resultados = False

@@ -18,7 +18,7 @@ def rastrigin(x):
     return 10*d + np.sum(x**2 - 10*np.cos(2*pi*x))
 
 def parallelRastrigin(pob):
-    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+    results = Parallel(n_jobs=-1, verbose=0, backend="threading")(
              map(delayed(rastrigin), pob))
     return results
 
@@ -35,7 +35,7 @@ def ackley(x):
     return  sumando1 - sumando2 + 20 + np.exp(1)
 
 def parallelAckley(pob):
-    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+    results = Parallel(n_jobs=-1, verbose=0, backend="threading")(
              map(delayed(ackley), pob))
     return results
 
@@ -55,7 +55,7 @@ def rosenbrock(x):
     return suma
 
 def parallelRosenbrock(pob):
-    results = Parallel(n_jobs=2, verbose=11, backend="threading")(
+    results = Parallel(n_jobs=2, verbose=0, backend="threading")(
              map(delayed(rosenbrock), pob))
     return results
 
@@ -71,7 +71,7 @@ def eggholder(x):
     return - sumando1 - sumando2
 
 def parallelEggholder(pob):
-    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+    results = Parallel(n_jobs=-1, verbose=0, backend="threading")(
              map(delayed(eggholder), pob))
     return results
 
@@ -84,7 +84,7 @@ def easom(x):
     return - np.cos(x1)*np.cos(x2)*np.exp(-(x1 - np.pi)**2 - (x2 - np.pi)**2)
 
 def parallelEasom(pob):
-    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+    results = Parallel(n_jobs=-1, verbose=0, backend="threading")(
              map(delayed(easom), pob))
     return results
 
@@ -109,6 +109,6 @@ def fa(indivuduo):
     return 418.9829*2 - x1* np.sin(np.sqrt(abs(x1))) - x2* np.sin(np.sqrt(abs(x2)))
 
 def parallelFa(pop):
-    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+    results = Parallel(n_jobs=-1, verbose=0, backend="threading")(
              map(delayed(fa), pop))
     return results

@@ -196,9 +196,9 @@ ub = 100*np.ones(nvars)
 pc = 0.9
 pm = 0.01
 npop = 200
-ngen = 100
+ngen = 10000
 # rastrigin
-#print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
+print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
 # ackley
 #print(algoritmo_evolutivo(parallelAckley, lb, ub, pc, pm, nvars, npop, ngen))
 # rosenbrock
