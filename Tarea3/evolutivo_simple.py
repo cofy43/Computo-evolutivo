@@ -14,6 +14,8 @@ Componentes avanzados:
     Paralelizmo en las funciones de aptitud
     Técnica de diversidad: Comparación de aptitud
 """
+nombre_generico = "Resultados/{name}/Resultados_problema_{name}_ejecución_{indice}.txt"
+nombre_generico_total = "Resultados/{name}/Resultados_problema_{name}_total.txt"
 # -Generar (aleatoriamente) una poblacion 
 #  inicial y evaluar
 # -Hasta cumplir la condición de paro:
@@ -115,23 +117,22 @@ def mutacion(genotipos, pm, lb, ub):
                 genotipos[i, j] = np.random.uniform(lb[j], ub[j])
     return genotipos
 
-def seleccion_mas(fenotipos, genotipos, aptitudes, hijos_genotipo, hijos_fenotipos, hijos_aptitudes, idx):
-    nuevos_fenotiopos = []
-    nuevos_genotipos = []
-    nuevas_aptitudes = []
-    # Primero agregamos a los padres seleccionados
-    for i in idx:
-        nuevos_fenotiopos.append(fenotipos[i])
-        nuevos_genotipos.append(genotipos[i])
-        nuevas_aptitudes.append(aptitudes[i])
-    for i in range(len(hijos_genotipo)):
-        nuevos_fenotiopos.append(hijos_fenotipos[i])
-        nuevos_genotipos.append(hijos_genotipo[i])
-        nuevas_aptitudes.append(hijos_aptitudes[i])
-    nuevos_fenotiopos = np.array(nuevos_fenotiopos)
-    nuevos_genotipos = np.array(nuevos_genotipos)
-    nuevas_aptitudes = np.array(nuevas_aptitudes)
-    return nuevos_fenotiopos, nuevos_genotipos, nuevas_aptitudes
+def seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes):
+    mitad = int(len(fenotipos)/2)
+    indices_mejores_padres = np.argpartition(aptitudes, -mitad)[-mitad:]
+    indices_mejores_hijos = np.argpartition(hijos_aptitudes, -mitad)[-mitad:]
+    # nuevo_fenotipo = fenotipos[indices_mejores_padres] + hijos_fenotipo[indices_mejores_hijos]
+    nuevo_fenotipo = []
+    nuevo_aptitudes = []
+    for i in indices_mejores_padres:
+        nuevo_aptitudes.append(aptitudes[i])
+        nuevo_fenotipo.append(fenotipos[i])
+
+    for i in indices_mejores_hijos:
+        nuevo_aptitudes.append(hijos_aptitudes[i])
+        nuevo_fenotipo.append(hijos_fenotipo[i])
+    nuevo_genotipo = nuevo_fenotipo
+    return np.array(nuevo_fenotipo), np.array(nuevo_genotipo), np.array(nuevo_aptitudes)
 
 def estadisticas(generacion, genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes, padres):
     print('---------------------------------------------------------')
@@ -159,6 +160,7 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
     bf = np.zeros((ngen, nvars))
     ba = np.zeros((ngen, 1))
     genotipos, fenotipos, aptitudes = inicializa(f, npop, nvars, lb, ub)
+    nombre_archivo_t = nombre_generico_total.format(name="Easom")
     for i in range(ngen):
         # Seleccion de padres
         indx = seleccion_padres(aptitudes, npop/2)
@@ -182,9 +184,30 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
         b_apt = np.copy(aptitudes[idx_best])
         ba[i] = np.copy(aptitudes[idx_best])
         # Seleccion de la siguiente generacion
-        genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipos, hijos_fenotipo, hijos_aptitudes, indx)
+        genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipos, hijos_fenotipo, hijos_aptitudes)
         # Mejor individuo
-        
+        """
+        nombre_archivo = nombre_generico.format(name="Easom" ,indice=i+1)
+        minma = aptitudes[np.argmin(aptitudes)]
+        maximo = aptitudes[idx_best]
+        media = np.median(aptitudes)
+        desviacion = np.std(aptitudes)
+        file = open(nombre_archivo, 'a')
+        file.write("Minima={min}\n".format(min=minma))
+        file.write("Media={med}\n".format(med=media))
+        file.write("Maxima={max}\n".format(max=maximo))
+        file.write("Desviación Estandar={de}\n".format(de=desviacion))
+        file.close()
+        file = open(nombre_archivo_t, 'a')
+        file.write("----------------------------------")
+        file.write("Ejecucion={indx}\n".format(indx=i))
+        file.write("Minima={min}\n".format(min=minma))
+        file.write("Media={med}\n".format(med=media))
+        file.write("Maxima={max}\n".format(max=maximo))
+        file.write("Desviación Estandar={de}\n".format(de=desviacion))
+        file.write("----------------------------------")
+        file.close()
+        """
     print('Tabla de mejores:\n', ba)
     #Regresar mejor solución
     idx = np.argmax(aptitudes)
@@ -196,9 +219,9 @@ ub = 100*np.ones(nvars)
 pc = 0.9
 pm = 0.01
 npop = 200
-ngen = 10000
+ngen = 20
 # rastrigin
-print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
+#print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
 # ackley
 #print(algoritmo_evolutivo(parallelAckley, lb, ub, pc, pm, nvars, npop, ngen))
 # rosenbrock
