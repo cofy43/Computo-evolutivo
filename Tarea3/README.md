@@ -9,10 +9,10 @@ Desarrollar un algoritmo evolutivo en Python con las siguientes características
     Selección: Más
     Elitismo: 
  * Seleccionar al menos dos técnicas avanzadas
-    * Paralelismo
+    * Paralelismo *
     * Coevolución
     * Metamodelos
-    * Técnicas de diversidad
+    * Técnicas de diversidad *
     * Meméticos
     * Hiper heurísticas 
  * Aplicar el evolutivo a los siguientes 5 problemas con n=10

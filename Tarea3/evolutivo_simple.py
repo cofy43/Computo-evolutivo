@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.core.fromnumeric import argpartition
 from problemas import *
 
 """
@@ -28,9 +27,9 @@ def inicializa(f, npop, nvar, lb, ub):
     # Fenotipos
     fenotipos = genotipos
     # Evaluar población
-    aptitudes = []
-    for fen in fenotipos:
-        aptitudes.append(f(fen))
+    aptitudes = f(fenotipos)
+    #for fen in fenotipos:
+    #    aptitudes.append(f(fen))
     aptitudes = np.array(aptitudes)
     return genotipos,fenotipos,aptitudes
 
@@ -154,9 +153,9 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
         # Mutacion
         hijos_genotipos = mutacion(hijos_genotipos, pm, lb, ub)
         hijos_fenotipo = hijos_genotipos
-        hijos_aptitudes = []
-        for fen in hijos_fenotipo:
-            hijos_aptitudes.append(f(fen))
+        hijos_aptitudes = f(hijos_fenotipo)
+        #for fen in hijos_fenotipo:
+        #    hijos_aptitudes.append(f(fen))
         hijos_aptitudes = np.array(hijos_aptitudes)
         idx_best = np.argmax(aptitudes)
         # Estadisticas
@@ -180,4 +179,13 @@ pc = 0.9
 pm = 0.01
 npop = 200
 ngen = 100
-print(algoritmo_evolutivo(rastrigin, lb, ub, pc, pm, nvars, npop, ngen))
+# rastrigin
+#print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
+# ackley
+#print(algoritmo_evolutivo(parallelAckley, lb, ub, pc, pm, nvars, npop, ngen))
+# rosenbrock
+#print(algoritmo_evolutivo(parallelRosenbrock, lb, ub, pc, pm, nvars, npop, ngen))
+# eggholder
+print(algoritmo_evolutivo(parallelEggholder, lb, ub, pc, pm, 2, npop, ngen))
+# easom
+#print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, 2, npop, ngen))

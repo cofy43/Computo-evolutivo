@@ -1,4 +1,7 @@
 import numpy as np
+from joblib import Parallel, delayed
+
+# Para definir la paralelización:
 
 # Número de dimensiones
 d = 10
@@ -14,6 +17,11 @@ def rastrigin(x):
     """
     return 10*d + np.sum(x**2 - 10*np.cos(2*pi*x))
 
+def parallelRastrigin(pob):
+    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+             map(delayed(rastrigin), pob))
+    return results
+
 def ackley(x):
     """
     Problema ACKLEY
@@ -25,6 +33,11 @@ def ackley(x):
     sumando1 = -20 * np.exp(-0.2 * np.sqrt(0.5 * np.sum(x**2)))
     sumando2 = np.exp(0.5*np.sum(np.cos(2*pi*x)))
     return  sumando1 - sumando2 + 20 + np.exp(1)
+
+def parallelAckley(pob):
+    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+             map(delayed(ackley), pob))
+    return results
 
 def rosenbrock(x):
     """
@@ -41,6 +54,11 @@ def rosenbrock(x):
         suma += 100*((xi1 - (xi**2))**2) + (xi-1)**2
     return suma
 
+def parallelRosenbrock(pob):
+    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+             map(delayed(rosenbrock), pob))
+    return results
+
 def eggholder(x):
     """
     Problema EGGHOLDER
@@ -52,6 +70,11 @@ def eggholder(x):
     sumando2 = x1*np.sin(np.sqrt(np.absolute(x1-(x2+47))))
     return - sumando1 - sumando2
 
+def parallelEggholder(pob):
+    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+             map(delayed(eggholder), pob))
+    return results
+
 def easom(x):
     """
     Problema EASOM
@@ -60,9 +83,15 @@ def easom(x):
     x2 = x[0]
     return - np.cos(x1)*np.cos(x2)*np.exp(-(x1 - np.pi)**2 - (x2 - np.pi)**2)
 
+def parallelEasom(pob):
+    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+             map(delayed(easom), pob))
+    return results
+
+"""
 x = np.array([1,2,3,4,5,6,7,8,9,0])
 print("rastrigin")
-print(rastrigin(x))
+print(parallelRastrigin(x))
 print("ackley")
 print(ackley(x))
 print("rosenbrock")
@@ -71,3 +100,4 @@ print("eggholder")
 print(eggholder(x))
 print("easom")
 print(easom(x))
+"""
