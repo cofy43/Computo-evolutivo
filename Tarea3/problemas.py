@@ -55,7 +55,7 @@ def rosenbrock(x):
     return suma
 
 def parallelRosenbrock(pob):
-    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+    results = Parallel(n_jobs=2, verbose=11, backend="threading")(
              map(delayed(rosenbrock), pob))
     return results
 

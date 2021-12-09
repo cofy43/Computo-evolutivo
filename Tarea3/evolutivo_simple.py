@@ -10,7 +10,9 @@ Componentes del algoritmo evolutivo simple:
     Cruza: Intermedia
     Mutación: uniforme
     Selección: Más
-    Elitismo: 
+Componentes avanzados:
+    Paralelizmo en las funciones de aptitud
+    Técnica de diversidad: Comparación de aptitud
 """
 # -Generar (aleatoriamente) una poblacion 
 #  inicial y evaluar
@@ -33,7 +35,21 @@ def inicializa(f, npop, nvar, lb, ub):
     aptitudes = np.array(aptitudes)
     return genotipos,fenotipos,aptitudes
 
-#def escalamiento():
+def diversidad(aptitudes):
+    nuevas_apt = []
+    suma_sh = 0
+    radio_nicho = 0.5
+    print(aptitudes)
+    # Subdividimos la población con base en la
+    # similitud entre los individuos
+    for i, j in zip(aptitudes[::2], aptitudes[1::2]):
+        d_i_j = i - j
+        if d_i_j < radio_nicho:
+            suma_sh += 1 - (d_i_j/radio_nicho)
+    # Calculamos las nuevas aptitudes 
+    for aptitud in aptitudes:
+        nuevas_apt.append(aptitud/suma_sh)
+    return nuevas_apt
     
 
 def seleccion_padres(aptitudes, npop):
@@ -154,9 +170,10 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
         hijos_genotipos = mutacion(hijos_genotipos, pm, lb, ub)
         hijos_fenotipo = hijos_genotipos
         hijos_aptitudes = f(hijos_fenotipo)
-        #for fen in hijos_fenotipo:
-        #    hijos_aptitudes.append(f(fen))
+        # Manteniendo la diversidad
+        hijos_aptitudes = diversidad(hijos_aptitudes)
         hijos_aptitudes = np.array(hijos_aptitudes)
+        
         idx_best = np.argmax(aptitudes)
         # Estadisticas
         estadisticas(i, genotipos, fenotipos, aptitudes, hijos_genotipos, hijos_fenotipo, hijos_aptitudes, indx)
@@ -164,9 +181,10 @@ def algoritmo_evolutivo(f, lb, ub, pc, pm, nvars, npop, ngen):
         b_fen = np.copy(fenotipos[idx_best])
         b_apt = np.copy(aptitudes[idx_best])
         ba[i] = np.copy(aptitudes[idx_best])
+        # Seleccion de la siguiente generacion
         genotipos, fenotipos, aptitudes = seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipos, hijos_fenotipo, hijos_aptitudes, indx)
         # Mejor individuo
-        # Seleccion de la siguiente generacion
+        
     print('Tabla de mejores:\n', ba)
     #Regresar mejor solución
     idx = np.argmax(aptitudes)
@@ -180,7 +198,7 @@ pm = 0.01
 npop = 200
 ngen = 100
 # rastrigin
-#print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
+print(algoritmo_evolutivo(parallelRastrigin, lb, ub, pc, pm, nvars, npop, ngen))
 # ackley
 #print(algoritmo_evolutivo(parallelAckley, lb, ub, pc, pm, nvars, npop, ngen))
 # rosenbrock
@@ -188,4 +206,4 @@ ngen = 100
 # eggholder
 #print(algoritmo_evolutivo(parallelEggholder, lb, ub, pc, pm, nvars, npop, ngen))
 # easom
-print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, nvars, npop, ngen))
+#print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, nvars, npop, ngen))
