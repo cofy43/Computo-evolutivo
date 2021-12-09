@@ -186,6 +186,6 @@ ngen = 100
 # rosenbrock
 #print(algoritmo_evolutivo(parallelRosenbrock, lb, ub, pc, pm, nvars, npop, ngen))
 # eggholder
-print(algoritmo_evolutivo(parallelEggholder, lb, ub, pc, pm, 2, npop, ngen))
+#print(algoritmo_evolutivo(parallelEggholder, lb, ub, pc, pm, nvars, npop, ngen))
 # easom
-#print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, 2, npop, ngen))
+print(algoritmo_evolutivo(parallelEasom, lb, ub, pc, pm, nvars, npop, ngen))
