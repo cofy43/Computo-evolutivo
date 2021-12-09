@@ -101,3 +101,14 @@ print(eggholder(x))
 print("easom")
 print(easom(x))
 """
+
+# Problema para el comparativo:
+
+def fa(indivuduo):
+    x1, x2 = indivuduo[0], indivuduo[1]
+    return 418.9829*2 - x1* np.sin(np.sqrt(abs(x1))) - x2* np.sin(np.sqrt(abs(x2)))
+
+def parallelFa(pop):
+    results = Parallel(n_jobs=-1, verbose=10, backend="threading")(
+             map(delayed(fa), pop))
+    return results

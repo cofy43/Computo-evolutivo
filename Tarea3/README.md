@@ -26,3 +26,19 @@ Desarrollar un algoritmo evolutivo en Python con las siguientes características
  *  Resultados promediados de 20 ejecuciones del algoritmo. Soluciones mínima, media, máxima y desviación estándar. Usar mismos parámetros para las 20 ejecuciones y reportarlos. Se debe generar un archivo por cada ejecución del algoritmo
  * Reportar gráfica de convergencia. Eje x número de generaciones, eje y mediana de la mejor aptitud de cada generación
  * PDF con los resultados de la ejecución mínima, resultados promediados, gráfica de convergencia y estimación de tamaño del espacio de búsqueda
+
+# Dependencias:
+Se requie la paquetería [Joblib](https://pypi.org/project/joblib/) para llevar a cabo la tarea de paralización
+```bash
+pip3 install joblib
+```
+
+Se requie la paquetería [Scipy](https://pypi.org/project/scipy/) para llevar a cabo la tarea de paralización
+```bash
+pip3 install scipy
+```
+
+Se requie la paquetería [Matplotlib](https://pypi.org/project/matplotlib/) para la generación de gráficas
+```bash
+pip3 install matplotlib
+```
