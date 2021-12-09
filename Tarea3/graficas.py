@@ -1,4 +1,19 @@
 import matplotlib.pyplot as plt
+"""
+@author: Martin Felipe Espinal Cruces
+Pequeño script para generar las gráficas de convergencia
+dado un archivo con la siguiente estructura:
+...
+----------------------------------
+Minima=0.0011142833743145867
+Media=10.881775063329597
+Maxima=0.00207233857703679
+Desviación Estandar=11.138195662798797
+------------------------------------
+...
+Así como la generación de tablas en formato latex para el 
+reporte
+"""
 
 def genera_grafica_convergencia(nombre, problema):
     # Se optienen los datos de los archivos guardados previamente
