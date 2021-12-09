@@ -29,7 +29,49 @@ def genera_grafica_convergencia(nombre, problema):
     plt.plot(generaciones, medianas, color = "c")
     plt.savefig('{name}.png'.format(name=problema))
 
+def genera_reporte_latex(archivo):
+    medianas = []
+    minimas = []
+    maxima = []
+    desviasciones = []
+    try:
+        f = open(archivo, 'rb')
+    except OSError:
+        print("Ocurrio un error al leer el archivo:", archivo)
+        print("Por tanto se omitiran los datos de dicho archivo en la grafica")
+    with f:
+        for line in f:
+            line = str(line)
+            if "Minima" in line:
+                valor = line.split("=")[1].replace("\\n", "")
+                valor = valor.replace("\'", "")
+                minimas.append(float(valor))
+            elif "Media" in line:
+                valor = line.split("=")[1].replace("\\n", "")
+                valor = valor.replace("\'", "")
+                medianas.append(float(valor))
+            elif "Maxima" in line:
+                valor = line.split("=")[1].replace("\\n", "")
+                valor = valor.replace("\'", "")
+                maxima.append(float(valor))
+            elif not "-" in line:
+                valor = line.split("=")[1].replace("\\n", "")
+                valor = valor.replace("\'", "")
+                desviasciones.append(float(valor))
+        print("\\begin{tabular}{| c | c | c | c | c |}")
+        print("\t\\hline")
+        print("\tGeneracion &Mínima &Media &Maxima &Desviación \\\\")
+        print("\t\\hline")
+        for i in range(20):
+            print("\t {g} &{min} &{med} &{max} &{des} \\\\".format(g=i+1, min=minimas[i], med=medianas[i], max=maxima[i], des=desviasciones[i] ))
+            print("\t\\hline")
+        print("\t Promedio &{min} &{med} &{max} &{des} \\\\".format(min=sum(minimas)/len(minimas), med=sum(medianas)/len(medianas), max=sum(maxima)/len(maxima), des=sum(desviasciones)/len(desviasciones) ))
+        print("\t\\hline")
+        print("\\end{tabular}")
+"""
 genera_grafica_convergencia("Resultados/Ackley/Resultados_problema_Ackley_total.txt", "Ackley")
 genera_grafica_convergencia("Resultados/Eggholder/Resultados_problema_Eggholder_total.txt", "Eggholder")
 genera_grafica_convergencia("Resultados/Rastrigin/Resultados_problema_Rastrigin_total.txt", "Rastrigin")
 genera_grafica_convergencia("Resultados/Rosenbrock/Resultados_problema_Rosenbrock_total.txt", "Rosenbrock")
+"""
+genera_reporte_latex("Resultados/Rosenbrock/Resultados_problema_Rosenbrock_total.txt")
