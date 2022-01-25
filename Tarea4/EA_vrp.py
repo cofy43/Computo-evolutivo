@@ -1,8 +1,10 @@
 import random
 import math
-
-from numpy import mat
 from parser_vrp import Parser
+
+"""
+@author: Alex Fernandez y Martin Espinal
+"""
 
 class EA:
     
@@ -33,6 +35,11 @@ class EA:
         self.locations = locations
 
     def inicialitation(self):
+        """
+        Funcion que se encarga de asignar aleatoriamente 
+        las locaciones a la los vehículos disponibles
+        procurando no exceder la capacidad indicada
+        """
         rotes = [[self.capacity, []] for _ in range(self.vehicles)]
         for i in range(self.customers):
             idx_vehicle = random.randint(0, self.vehicles-1)
@@ -46,8 +53,16 @@ class EA:
         return rotes
 
     def euclidian_distance(self, p1, p2):
+        """
+        Función auxiliar que se encarga de calcular
+        la distancia euclidiana de dos puntos
+        """
         return math.sqrt( math.pow((p1[0] - p2[0]), 2 ) - math.pow((p1[1], p2[1]), 2))
 
+    def EA(self):
+        """
+        Ejecución del algoritmo evolutivo
+        """
 
 
 if __name__ == "__main__":
@@ -56,10 +71,3 @@ if __name__ == "__main__":
     parser = Parser(path)
     customers, vehicles, capacity, locations = parser.get_data()
     ea = EA(0.5,0.8,0,10000,100,customers, vehicles, capacity, locations)
-    for v in ea.inicialitation():
-        print(v)
-        total = 0
-        for c in v[1]:
-            total += c[0]
-        print("total = ", total)
-        print()

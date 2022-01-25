@@ -1,5 +1,8 @@
 class Parser:
-
+    """
+    Clase auxiliar para poder parsear los archivos de 
+    prueba
+    """
     def __init__(self, path):
         self.customers = 0
         self.vehicles = 0
