@@ -42,15 +42,23 @@ class EA:
         las locaciones a la los vehículos disponibles
         procurando no exceder la capacidad indicada
         """
+        #Generamos una lista con dos entradas, la primera
+        #representará la capacidad del vehículo e irá
+        #actualizando según la locación aleatoriamente
+        #seleccionada. La segunda entrada representará la
+        #lista de locaciones para un vehículo
         routes = [[self.capacity, []] for _ in range(self.vehicles)]
         for i in range(self.customers-1):
             idx_vehicle = random.randint(0, self.vehicles-1)
             location = self.locations[i]
             diff = routes[idx_vehicle][0] - location[0]
+            #Verificamos que la locación seleccionada para un
+            #vehículo no exceda la capacidad máxima
             if diff >= 0:
                 routes[idx_vehicle][1].append(location)
                 routes[idx_vehicle][0] = diff
             else:
+            #Si excede repetimos el experimento
                 i -= 1
         return routes, routes, self.fitnes(routes)
 
@@ -74,16 +82,25 @@ class EA:
             #Verificamos que los vehículos tengan
             #asignados al menos una ruta
             if length > 0:
+                #Distancia entre el origen y el primer
+                #punto de distribucion de i-esimo vehiculo
                 p1 = vehicle[1][0][1:]
                 total += self.euclidian_distance(self.center, p1)
                 for i in range(1, length-1, 2):
                     p1 = vehicle[1][i][1:]
                     p2 = vehicle[1][i+1][1:]
                     total += self.euclidian_distance(p1, p2)
+                #Como recorremos la lista de puntos de distribucion
+                #de los vehículos en pasos de dos podemos caer en 
+                #caso de que dicha liste tenga una longitud impar y
+                #esta condicion se encarga de cubrir ese caso para que
+                #la suma de distacia sea correcta
                 if length%2 != 0:
                     p1 = vehicle[1][length-2][1:]
                     p2 = vehicle[1][length-1][1:]
                     total += self.euclidian_distance(p1, p2)
+                #Calculamos la distancia del último punto de distribución
+                #al punto de origen
                 p1 = vehicle[1][length-1][1:]                
                 total += self.euclidian_distance(p1, self.center)
             apts.append(total)
@@ -94,15 +111,7 @@ class EA:
         Ejecución del algoritmo evolutivo
         """
         genotipos, fenotipos, aptitudes = self.inicialitation()
-        for i in range(len(genotipos)):
-            v = genotipos[i]
-            total = 0
-            print(v)
-            for c in v[1]:
-                total += c[0]
-            print(total)
-            print(aptitudes[i])
-            print()
+        
 
 
 
