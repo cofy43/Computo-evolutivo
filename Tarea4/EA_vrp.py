@@ -1,5 +1,5 @@
 import random
-import math
+from math import dist
 from parser_vrp import Parser
 
 """
@@ -40,34 +40,73 @@ class EA:
         las locaciones a la los vehículos disponibles
         procurando no exceder la capacidad indicada
         """
-        rotes = [[self.capacity, []] for _ in range(self.vehicles)]
+        routes = [[self.capacity, []] for _ in range(self.vehicles)]
         for i in range(self.customers):
             idx_vehicle = random.randint(0, self.vehicles-1)
             location = self.locations[i]
-            diff = rotes[idx_vehicle][0] - location[0]
+            diff = routes[idx_vehicle][0] - location[0]
             if diff >= 0:
-                rotes[idx_vehicle][1].append(location)
-                rotes[idx_vehicle][0] = diff
+                routes[idx_vehicle][1].append(location)
+                routes[idx_vehicle][0] = diff
             else:
                 i -= 1
-        return rotes
+        return routes, routes, self.fitnes(routes)
 
     def euclidian_distance(self, p1, p2):
         """
         Función auxiliar que se encarga de calcular
-        la distancia euclidiana de dos puntos
+        la distancia euclidiana de dos puntos con
+        la ayuda de la paqueteria math
         """
-        return math.sqrt( math.pow((p1[0] - p2[0]), 2 ) - math.pow((p1[1], p2[1]), 2))
+        return dist(p1, p2)
+
+    def fitnes(self, routes):
+        """
+        Funcion encargada de la evaluacion de la
+        distancia recorrida por los vehiculos
+        """
+        apts = []
+        for vehicle in routes:
+            total = 0
+            length = len(vehicle[1])
+            #Verificamos que los vehículos tengan
+            #asignados al menos una ruta
+            if length > 0:
+                for i in range(0, length-1, 2):
+                    p1 = vehicle[1][i][1:]
+                    p2 = vehicle[1][i+1][1:]
+                    total += self.euclidian_distance(p1, p2)
+                if length%2 != 0:
+                    p1 = vehicle[1][length-2][1:]
+                    p2 = vehicle[1][length-1][1:]
+                    total += self.euclidian_distance(p1, p2)
+                p1 = vehicle[1][length-1][1:]
+                p2 = vehicle[1][0][1:]
+                total += self.euclidian_distance(p1, p2)
+            apts.append(total)
+        return apts
 
     def EA(self):
         """
         Ejecución del algoritmo evolutivo
         """
+        genotipos, fenotipos, aptitudes = self.inicialitation()
+        for i in range(len(genotipos)):
+            v = genotipos[i]
+            total = 0
+            print(v)
+            for c in v[1]:
+                total += c[0]
+            print(total)
+            print(aptitudes[i])
+            print()
+
 
 
 if __name__ == "__main__":
-    #path = "vrp_5_4_1"
-    path = "vrp_484_19_1"
+    path = "vrp_5_4_1"
+    #path = "vrp_484_19_1"
     parser = Parser(path)
     customers, vehicles, capacity, locations = parser.get_data()
     ea = EA(0.5,0.8,0,10000,100,customers, vehicles, capacity, locations)
+    ea.EA()
