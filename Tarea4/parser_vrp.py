@@ -8,11 +8,13 @@ class Parser:
         self.vehicles = 0
         self.capacity = 0
         self.locations = []
+        self.center = []
         self.parser_file(path)
 
     def parser_file(self,path):
         file = open(path, "r")
         first_line = False
+        second_line = False
         for line in file:
             if not(first_line):
                 first_line = True
@@ -20,10 +22,18 @@ class Parser:
                 self.customers = int(temp_customers)
                 self.vehicles = int(temp_vehicle)
                 self.capacity = int(temp_capacity)
+            elif not(second_line):
+                second_line = True
+                self.center = self.parser_location(line)[1:]
             elif line != "":
-                data = line.replace("\n", "").split(' ')
-                location = [int(data[0]), float(data[1]), float(data[2])]
+                location = self.parser_location(line)
                 self.locations.append(location)
 
+    def parser_location(self, line):
+        data = line.replace("\n", "").split(' ')
+        location = [int(data[0]), float(data[1]), float(data[2])]
+        return location
+
+
     def get_data(self):
-        return self.customers, self.vehicles, self.capacity, self.locations
+        return self.customers, self.vehicles, self.capacity, self.locations, self.center
