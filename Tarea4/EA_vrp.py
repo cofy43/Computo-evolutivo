@@ -128,7 +128,7 @@ class EA:
             temp_aptitudes.pop()
         return parents
 
-    def crossover(self, indx, genotipos, pc):
+    def crossover(self, idx, genotipos, pc):
         """
         Función encargada de realizar la cruza de un punto
         pero por la representación elegida (una lista de
@@ -141,9 +141,11 @@ class EA:
         pc: Probabilidad de cruza
         """
         hijos_genitipo = []
+        """
         for i in indx:
             flip = np.random.uniform() <= pc
             if flip and len(genotipos[i]) > 0:
+                print("se hace cruza")
                 individuo = genotipos[i]
                 ruta = individuo[1]
                 punto_cruza = 0
@@ -155,6 +157,36 @@ class EA:
                 hijos_genitipo.append(nuevo_individuo)
             else:
                 hijos_genitipo.append(genotipos[i])
+        """
+        for i,j in zip(idx[::2], idx[1::2]):
+            flip = np.random.uniform()<=pc
+            if flip:
+                punto_cruza = 0
+                ruta1 = genotipos[i][1]
+                ruta2 = genotipos[j][1]
+                length1 = len(ruta1)
+                length2 = len(ruta2)
+                if length1 > length2:
+                    punto_cruza = np.random.randint(0, length2) if length2 > 0 else 0
+                elif length1 < length2:
+                    punto_cruza = np.random.randint(0, length1) if length1 > 0 else 0
+                else :
+                    punto_cruza = np.random.randint(0, length2)
+                nueva_ruta1 = ruta1[0:punto_cruza] + ruta2[punto_cruza:]
+                nueva_ruta2 = ruta2[0:punto_cruza] + ruta1[punto_cruza:]
+                utilizado = 0
+                for punto in nueva_ruta1:
+                    utilizado += punto[0]
+                nueva_capacidad1 = self.capacity - utilizado
+                utilizado = 0
+                for punto in nueva_ruta2:
+                    utilizado += punto[0]
+                nueva_capacidad2 = self.capacity - utilizado
+                hijos_genitipo.append([nueva_capacidad1, nueva_ruta1])
+                hijos_genitipo.append([nueva_capacidad2, nueva_ruta2])
+            else :
+                hijos_genitipo.append(genotipos[i])
+                hijos_genitipo.append(genotipos[j])
         return hijos_genitipo
 
     def mutation(self, genotipos_hijos, pm):
@@ -242,12 +274,17 @@ class EA:
         #maximo = np.copy(genotipos[np.argmax(aptitudes)])
         #desviacion = np.std(aptitudes)
         #ba = np.zeros((self.ng, 1))
-        for i in range(self.ng):
+        for i in range(1):
             #Seleccion de padres
             indx = self.tournament_selection(aptitudes, self.np)
-            """
             #Cruza
             hijos_genotipo = self.crossover(indx,genotipos,self.pc)
+            print("fenotipos")
+            print(fenotipos)
+            print("hijos_genotipo")
+            print(hijos_genotipo)
+            print(len(hijos_genotipo))
+            """
             #Mutación
             hijos_genotipo = self.mutation(hijos_genotipo, self.pm)
             hijos_fenotipo = hijos_genotipo
@@ -259,8 +296,8 @@ class EA:
         print(genotipos)
 
 if __name__ == "__main__":
-    path = "vrp_5_4_1"
-    #path = "vrp_484_19_1"
+    #path = "vrp_5_4_1"
+    path = "vrp_484_19_1"
     parser = Parser(path)
     customers, vehicles, capacity, locations, center = parser.get_data()
     ea = EA(0.5,0.4,0.5,10000,10,vehicles, customers, vehicles, capacity, locations, center)
