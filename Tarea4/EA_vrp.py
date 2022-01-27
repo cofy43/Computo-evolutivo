@@ -87,7 +87,7 @@ class EA:
                 length = len(vehicle[1])
             #Verificamos que los vehículos tengan
             #asignados al menos una ruta
-            if length > 0:
+            if length > 0 and vehicle[0] >= 0:
                 #Distancia entre el origen y el primer
                 #punto de distribucion de i-esimo vehiculo
                 p1 = vehicle[1][0][1:]
@@ -109,16 +109,18 @@ class EA:
                 #al punto de origen
                 p1 = vehicle[1][length-1][1:]
                 total += self.euclidian_distance(p1, self.center)
+            elif vehicle[0] < 0:
+                total = -1
             apts.append(total)
         return apts
 
     def tournament_selection(self, aptitudes, npop):
         parents = []
+        print()
         temp_aptitudes = aptitudes.copy()
         for _ in range(npop):
-            c1 = np.random.randint(low=0, high=len(temp_aptitudes))
-            c2 = np.random.randint(0, len(temp_aptitudes))
-            
+            c1 = np.random.randint(low=0, high=len(temp_aptitudes)) if len(temp_aptitudes)>0 else 0
+            c2 = np.random.randint(0, len(temp_aptitudes)) if len(temp_aptitudes)>0 else 0
             p1 = temp_aptitudes[c1]
             p2 = temp_aptitudes[c2]
             if p1 > p2:
@@ -221,48 +223,25 @@ class EA:
         print('Mejor individuo en la generación: ', np.argmax(aptitudes))
 
     def seleccion_mas(self, genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes):
-        """
-        """
+        add_one = True if len(fenotipos)%2 !=0 else False
         mitad = int(len(fenotipos)/2)
-        nuevo_fenotipo = [[] for _ in range(len(fenotipos))]
-        nuevo_aptitudes = [0 for _ in range(len(fenotipos))]
-        #ordenamos con el algoritmo insertion sort los
-        #padres como los hijos en base a la aptitud
-        
-        for i in range(len(aptitudes)):
-            keyp = aptitudes[i]
-            keyfp = fenotipos[i]
-            j = i-1
-            while j >= 0 and keyp < aptitudes[j]:
-                aptitudes[j+1] = aptitudes[j]
-                fenotipos[j+1] = fenotipos[j]
-                j -= 1
-            aptitudes[j+1] = keyp
-            fenotipos[j+1] = keyfp
-        aptitudes.reverse()
-        fenotipos.reverse()
-        for i in range(len(hijos_aptitudes)):
-            key = hijos_aptitudes[i]
-            keyf = hijos_fenotipo[i]
-            j = i-1
-            while j >= 0 and key < hijos_aptitudes[j]:
-                hijos_aptitudes[j+1] = hijos_aptitudes[j]
-                hijos_fenotipo[j+1] = hijos_fenotipo[j]
-                j -= 1
-            hijos_aptitudes[j+1] = key
-            hijos_fenotipo[j+1] = keyf
-        hijos_fenotipo.reverse()
-        hijos_aptitudes.reverse()
-        for i in range(mitad):
+        indices_mejores_padres = np.argpartition(aptitudes, -mitad)[-mitad:]
+        if add_one:
+            mitad+=1
+        indices_mejores_hijos = np.argpartition(hijos_aptitudes, -mitad)[-mitad:]
+        # nuevo_fenotipo = fenotipos[indices_mejores_padres] + hijos_fenotipo[indices_mejores_hijos]
+        nuevo_fenotipo = []
+        nuevo_aptitudes = []
+        for i in indices_mejores_padres:
             nuevo_aptitudes.append(aptitudes[i])
             nuevo_fenotipo.append(fenotipos[i])
-        for i in range(int(math.floor(mitad/2))-1):
-            print(hijos_aptitudes)
-            print(i)
+
+        for i in indices_mejores_hijos:
             nuevo_aptitudes.append(hijos_aptitudes[i])
             nuevo_fenotipo.append(hijos_fenotipo[i])
-        
-        return nuevo_fenotipo, nuevo_fenotipo, nuevo_aptitudes
+        nuevo_genotipo = nuevo_fenotipo
+        return nuevo_fenotipo, nuevo_genotipo, nuevo_aptitudes
+
 
     def EA(self):
         """
@@ -274,6 +253,7 @@ class EA:
         #maximo = np.copy(genotipos[np.argmax(aptitudes)])
         #desviacion = np.std(aptitudes)
         #ba = np.zeros((self.ng, 1))
+        print(len(aptitudes))
         for i in range(self.ng):
             #Seleccion de padres
             indx = self.tournament_selection(aptitudes, self.np)
@@ -283,17 +263,22 @@ class EA:
             hijos_genotipo = self.mutation(hijos_genotipo, self.pm)
             hijos_fenotipo = hijos_genotipo
             hijos_aptitudes = self.fitnes(hijos_genotipo)
-            """
-            #self.estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
+            self.estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
             #Seleccion de la siguiente generación
             genotipos, fenotipos, aptitudes = self.seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
-        """
-        print(genotipos)
+        return genotipos, aptitudes
+
+
 
 if __name__ == "__main__":
     path = "vrp_5_4_1"
     #path = "vrp_484_19_1"
     parser = Parser(path)
     customers, vehicles, capacity, locations, center = parser.get_data()
-    ea = EA(0.5,0.4,0.5,10000,10,vehicles, customers, vehicles, capacity, locations, center)
-    ea.EA()
+    ea = EA(0.5,0.4,0.5,10000,customers,vehicles, customers, vehicles, capacity, locations, center)
+    rutas,distancias =  ea.EA()
+    print()
+    print("Output Format")
+    print(sum(distancias), '0')
+    for vehiculo in rutas:
+        print(rutas)
