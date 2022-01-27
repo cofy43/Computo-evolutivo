@@ -1,3 +1,4 @@
+import math
 import random
 import numpy as np
 from math import dist
@@ -33,7 +34,7 @@ class EA:
         self.li = li
         self.ng = ng
         self.np = np
-        self.customers = customers
+        self.customers = customers-1
         self.vehicles = vehicles
         self.capacity = capacity
         self.locations = locations
@@ -51,7 +52,7 @@ class EA:
         #seleccionada. La segunda entrada representará la
         #lista de locaciones para un vehículo
         routes = [[self.capacity, []] for _ in range(self.vehicles)]
-        for i in range(self.customers-1):
+        for i in range(self.customers):
             idx_vehicle = random.randint(0, self.vehicles-1)
             location = self.locations[i]
             diff = routes[idx_vehicle][0] - location[0]
@@ -81,7 +82,9 @@ class EA:
         apts = []
         for vehicle in routes:
             total = 0
-            length = len(vehicle[1])
+            length = 0
+            if len(vehicle) > 0: 
+                length = len(vehicle[1])
             #Verificamos que los vehículos tengan
             #asignados al menos una ruta
             if length > 0:
@@ -89,7 +92,7 @@ class EA:
                 #punto de distribucion de i-esimo vehiculo
                 p1 = vehicle[1][0][1:]
                 total += self.euclidian_distance(self.center, p1)
-                for i in range(1, length-1, 2):                    
+                for i in range(0, length-1, 2):                    
                     p1 = vehicle[1][i][1:]
                     p2 = vehicle[1][i+1][1:]
                     total += self.euclidian_distance(p1, p2)
@@ -98,13 +101,13 @@ class EA:
                 #caso de que dicha liste tenga una longitud impar y
                 #esta condicion se encarga de cubrir ese caso para que
                 #la suma de distacia sea correcta
-                if length%2 != 0:
+                if length%2 != 0 and length > 1:
                     p1 = vehicle[1][length-2][1:]
                     p2 = vehicle[1][length-1][1:]
                     total += self.euclidian_distance(p1, p2)
                 #Calculamos la distancia del último punto de distribución
                 #al punto de origen
-                p1 = vehicle[1][length-1][1:]                
+                p1 = vehicle[1][length-1][1:]
                 total += self.euclidian_distance(p1, self.center)
             apts.append(total)
         return apts
@@ -139,9 +142,8 @@ class EA:
         """
         hijos_genitipo = []
         for i in indx:
-            print(i)
             flip = np.random.uniform() <= pc
-            if flip:
+            if flip and len(genotipos[i]) > 0:
                 individuo = genotipos[i]
                 ruta = individuo[1]
                 punto_cruza = 0
@@ -163,7 +165,7 @@ class EA:
         hijos_genitipo = []
         for gen in genotipos_hijos:
             flip = np.random.uniform() <= pm
-            if flip and len(gen[1]) > 0:
+            if flip and len(gen) > 0 and len(gen[1]) > 0:
                 ruta = gen[1]
                 i1 = np.random.randint(0, len(ruta))
                 i2 = np.random.randint(0, len(ruta))
@@ -222,7 +224,9 @@ class EA:
         for i in range(mitad):
             nuevo_aptitudes.append(aptitudes[i])
             nuevo_fenotipo.append(fenotipos[i])
-        for i in range(int(mitad/2)):
+        for i in range(int(math.floor(mitad/2))-1):
+            print(hijos_aptitudes)
+            print(i)
             nuevo_aptitudes.append(hijos_aptitudes[i])
             nuevo_fenotipo.append(hijos_fenotipo[i])
         
@@ -241,21 +245,18 @@ class EA:
         for i in range(self.ng):
             #Seleccion de padres
             indx = self.tournament_selection(aptitudes, self.np)
-            print(indx)
+            """
             #Cruza
             hijos_genotipo = self.crossover(indx,genotipos,self.pc)
-            print("hijos_genotipo")
-            print(hijos_genotipo)
             #Mutación
             hijos_genotipo = self.mutation(hijos_genotipo, self.pm)
             hijos_fenotipo = hijos_genotipo
             hijos_aptitudes = self.fitnes(hijos_genotipo)
-            print("hijos_genotipo")
-            print(hijos_genotipo)
-            self.estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
+            #self.estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
             #Seleccion de la siguiente generación
             genotipos, fenotipos, aptitudes = self.seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
-
+        """
+        print(genotipos)
 
 if __name__ == "__main__":
     path = "vrp_5_4_1"
