@@ -171,7 +171,7 @@ class EA:
                 elif length1 < length2:
                     punto_cruza = np.random.randint(0, length1) if length1 > 0 else 0
                 else :
-                    punto_cruza = np.random.randint(0, length2)
+                    punto_cruza = np.random.randint(0, length2) if length2 > 0 else 0
                 nueva_ruta1 = ruta1[0:punto_cruza] + ruta2[punto_cruza:]
                 nueva_ruta2 = ruta2[0:punto_cruza] + ruta1[punto_cruza:]
                 utilizado = 0
@@ -197,13 +197,13 @@ class EA:
         hijos_genitipo = []
         for gen in genotipos_hijos:
             flip = np.random.uniform() <= pm
-            if flip and len(gen) > 0 and len(gen[1]) > 0:
+            if flip and len(gen[1]) > 0:
                 ruta = gen[1]
-                i1 = np.random.randint(0, len(ruta))
-                i2 = np.random.randint(0, len(ruta))
-                temp = ruta[i1]
-                ruta[i1] = ruta[i2]
-                ruta[i2] = temp
+                p1 = np.random.randint(0, len(ruta))
+                p2 = np.random.randint(0, len(ruta))
+                temp = ruta[p1]
+                ruta[p1] = ruta[p2]
+                ruta[p2] = temp
                 hijos_genitipo.append([gen[0], ruta])
             else:
                 hijos_genitipo.append(gen)
@@ -274,21 +274,16 @@ class EA:
         #maximo = np.copy(genotipos[np.argmax(aptitudes)])
         #desviacion = np.std(aptitudes)
         #ba = np.zeros((self.ng, 1))
-        for i in range(1):
+        for i in range(self.ng):
             #Seleccion de padres
             indx = self.tournament_selection(aptitudes, self.np)
             #Cruza
             hijos_genotipo = self.crossover(indx,genotipos,self.pc)
-            print("fenotipos")
-            print(fenotipos)
-            print("hijos_genotipo")
-            print(hijos_genotipo)
-            print(len(hijos_genotipo))
-            """
             #Mutación
             hijos_genotipo = self.mutation(hijos_genotipo, self.pm)
             hijos_fenotipo = hijos_genotipo
             hijos_aptitudes = self.fitnes(hijos_genotipo)
+            """
             #self.estadisticas(i, genotipos, fenotipos, np.array(aptitudes), np.array(hijos_genotipo), np.array(hijos_fenotipo), np.array(hijos_aptitudes), indx)
             #Seleccion de la siguiente generación
             genotipos, fenotipos, aptitudes = self.seleccion_mas(genotipos, fenotipos, aptitudes, hijos_genotipo, hijos_fenotipo, hijos_aptitudes)
@@ -296,8 +291,8 @@ class EA:
         print(genotipos)
 
 if __name__ == "__main__":
-    #path = "vrp_5_4_1"
-    path = "vrp_484_19_1"
+    path = "vrp_5_4_1"
+    #path = "vrp_484_19_1"
     parser = Parser(path)
     customers, vehicles, capacity, locations, center = parser.get_data()
     ea = EA(0.5,0.4,0.5,10000,10,vehicles, customers, vehicles, capacity, locations, center)
